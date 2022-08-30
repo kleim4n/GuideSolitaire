@@ -13,26 +13,36 @@ class Game{
     }
     getNewCard(){
         $.getJSON(`https://www.deckofcardsapi.com/api/deck/${this.deck_id}/draw/`, function(json){
-            console.log(json.cards[0]);
-            this.lastCard = new Card(json.cards[0].code, json.cards[0].image);
-            console.log(this.lastCard);
-            $('body').append('<img src="'+this.lastCard.image+'" alt="'+this.lastCard.code+'">');
-            //this.lastCard.code = json.cards[0].code;
-            //this.lastCard.image = json.cards[0].image;
+            $('.divDeck').append(`<img id="${json.cards[0].code}" src="${json.cards[0].image}" alt="${json.cards[0].code}">`);
         });
     }
-    printLastCard(){
-        console.log(this.lastCard);
+    drawCardFromDeck(code){
+        $.getJSON(`https://www.deckofcardsapi.com/api/deck/${this.deck_id}/draw/?cards=`+code);
     }
-
+    moveCardToUnused(code){
+        $.getJSON(`https://www.deckofcardsapi.com/api/deck/${this.deck_id}/pile/unused/add/?cards=${code}`);
+    }
+    resetDeck(){
+        $.getJSON(`https://www.deckofcardsapi.com/api/deck/${this.deck_id}/return/`);
+    }
+    generateIMGsOnHTML(){
+        //Get all the 52 cards
+        $.getJSON(`https://www.deckofcardsapi.com/api/deck/${this.deck_id}/draw/?count=52`, function(json){
+            json.cards.forEach(function(card){
+                //Put each card in it respective div by suit
+                $('.divDeck'+card.suit).append(`<img id="${card.code}" src="${card.image}" alt="${card.code}">`);
+            });
+            //$.getJSON(`https://www.deckofcardsapi.com/api/deck/${this.deck_id}/pile/unused/add/?cards=${card.cards[0].code}`);
+        });
+    }
 }
-var game;
 
 $(document).ready(function(){
-    $.getJSON('https://www.deckofcardsapi.com/api/deck/zz45tbc98nyy/shuffle', function(deck){
-        console.log(deck.deck_id);
-        game = new Game(deck.deck_id);
-        game.getNewCard();
-        console.log(game.lastCard);
+    $.getJSON('https://www.deckofcardsapi.com/api/deck/new/', function(deck){
+        var game = new Game(deck.deck_id);
+        console.log(game.deck_id);
+        $('.buttonNewCard').click(function(){game.getNewCard();});
+        $('.buttonResetDeck').click(function(){game.resetDeck();});
+        game.generateIMGsOnHTML();
     });
 });

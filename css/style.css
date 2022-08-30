@@ -1,0 +1,13 @@
+img{
+    height: auto;
+    max-width: 5rem;
+}
+div{
+    margin: 0.2rem;
+}
+.divDeck{
+    border: solid black;
+}
+.divUnused{
+    border: solid red;
+}
